@@ -31,7 +31,7 @@ class Simple(TimeStampedModel):
     moderated = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['modified']
+        ordering = ['section', 'order', 'modified']
         verbose_name = 'Story'
         verbose_name_plural = 'Simple Story'
 
