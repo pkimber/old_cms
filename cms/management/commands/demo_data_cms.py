@@ -10,4 +10,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         make_section('home')
         make_section('portfolio')
+        make_section('tech')
         print("Created 'cms' demo data...")
