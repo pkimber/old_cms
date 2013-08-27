@@ -26,8 +26,9 @@ class Simple(TimeStampedModel):
     order = models.IntegerField()
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    moderated = models.BooleanField(default=False)
     picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
+    url = models.URLField(blank=True, null=True)
+    moderated = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['modified']

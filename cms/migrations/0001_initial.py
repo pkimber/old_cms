@@ -24,8 +24,9 @@ class Migration(SchemaMigration):
             ('order', self.gf('django.db.models.fields.IntegerField')()),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('moderated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('picture', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
+            ('url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
+            ('moderated', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'cms', ['Simple'])
 
@@ -54,7 +55,8 @@ class Migration(SchemaMigration):
             'order': ('django.db.models.fields.IntegerField', [], {}),
             'picture': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cms.Section']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         }
     }
 
