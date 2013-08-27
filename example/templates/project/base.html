@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+  CMS
+{% endblock title %}
+
+{% block heading %}
+  CMS
+{% endblock heading %}
+
+{% block sub_heading %}
+  Example App
+{% endblock sub_heading %}
+
+{% block menu %}
+  <li>
+    <a href="{% url "admin:index" %}">Admin</a>
+  </li>
+  {{ block.super }}
+{% endblock menu %}
+
