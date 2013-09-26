@@ -1,4 +1,4 @@
 django-reversion==1.7.1
-Django==1.5.2
+django==1.5.4
 pillow
 south
