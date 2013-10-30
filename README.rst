@@ -73,4 +73,4 @@ Usage
 Release
 =======
 
-https://github.com/pkimber/docs_cloud
+https://github.com/pkimber/docs
