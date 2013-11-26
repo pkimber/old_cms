@@ -24,7 +24,7 @@ class Simple(TimeStampedModel):
     """ Event """
     section = models.ForeignKey(Section)
     order = models.IntegerField()
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     description = models.TextField(blank=True, null=True)
     picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
     url = models.URLField(blank=True, null=True)
