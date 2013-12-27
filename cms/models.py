@@ -58,9 +58,17 @@ reversion.register(Page)
 
 class SectionManager(models.Manager):
 
+    def pending(self, page):
+        return self.model.objects.filter(
+            page=page,
+        ).order_by(
+            'order'
+        )
+
     def published(self, page):
         return self.model.objects.filter(
-            page=page
+            page=page,
+            moderate_state=ModerateState.published(),
         ).order_by(
             'order'
         )
@@ -88,7 +96,14 @@ class Section(TimeStampedModel):
     def __unicode__(self):
         return unicode('{}'.format(self.title))
 
+    def set_published(self):
+        self.moderate_state = ModerateState.published()
+
     def set_removed(self):
         self.moderate_state = ModerateState.removed()
+
+    def _pending(self):
+        return self.moderate_state == ModerateState.pending()
+    pending = property(_pending)
 
 reversion.register(Section)
