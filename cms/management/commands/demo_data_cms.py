@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from cms.tests.model_maker import make_section
+from cms.tests.model_maker import make_page
 
 
 class Command(BaseCommand):
@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = "Create demo data for 'cms'"
 
     def handle(self, *args, **options):
-        make_section('home')
-        make_section('portfolio')
-        make_section('tech')
+        make_page('home')
+        make_page('portfolio')
+        make_page('tech')
         print("Created 'cms' demo data...")

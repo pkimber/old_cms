@@ -4,8 +4,8 @@ from base.tests.model_maker import clean_and_save
 
 from cms.models import (
     ModerateState,
+    Page,
     Section,
-    Simple,
 )
 
 
@@ -18,18 +18,18 @@ def make_moderate_state(name, **kwargs):
     return clean_and_save(ModerateState(**defaults))
 
 
-def make_section(name, **kwargs):
+def make_page(name, **kwargs):
     return clean_and_save(
-        Section(
+        Page(
             name=name,
             **kwargs
         )
     )
 
 
-def make_simple(section, order, title, **kwargs):
+def make_section(section, order, title, **kwargs):
     return clean_and_save(
-        Simple(
+        Section(
             section=section,
             order=order,
             title=title,

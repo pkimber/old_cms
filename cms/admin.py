@@ -1,15 +1,18 @@
 from django.contrib import admin
 
-from .models import Section, Simple
+from .models import (
+    Page,
+    Section,
+)
+
+
+class PageAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Page, PageAdmin)
 
 
 class SectionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('page', 'order', 'title', 'moderate_state')
 
 admin.site.register(Section, SectionAdmin)
-
-
-class SimpleAdmin(admin.ModelAdmin):
-    list_display = ('section', 'order', 'title', 'moderate_state')
-
-admin.site.register(Simple, SimpleAdmin)
