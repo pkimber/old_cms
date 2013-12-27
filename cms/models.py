@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 import reversion
 
@@ -59,11 +60,24 @@ reversion.register(Page)
 class SectionManager(models.Manager):
 
     def pending(self, page):
-        return self.model.objects.filter(
+        published = ModerateState.published()
+        pending = ModerateState.pending()
+        sections = self.model.objects.filter(
             page=page,
+            moderate_state__in=[published, pending],
         ).order_by(
-            'order'
+            'order',
+            'moderate_state__slug',
         )
+        previous = None
+        result = []
+        for section in sections:
+            if previous and section.order == previous:
+                pass
+            else:
+                result.append(section)
+            previous = section.order
+        return result
 
     def published(self, page):
         return self.model.objects.filter(
@@ -90,6 +104,7 @@ class Section(TimeStampedModel):
 
     class Meta:
         ordering = ['page', 'order', 'modified']
+        unique_together = ('page', 'order', 'moderate_state')
         verbose_name = 'Section'
         verbose_name_plural = 'Sections'
 
