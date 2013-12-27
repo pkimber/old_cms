@@ -96,6 +96,9 @@ class Section(TimeStampedModel):
     def __unicode__(self):
         return unicode('{}'.format(self.title))
 
+    def set_pending(self):
+        self.moderate_state = ModerateState.pending()
+
     def set_published(self):
         self.moderate_state = ModerateState.published()
 
@@ -105,5 +108,9 @@ class Section(TimeStampedModel):
     def _pending(self):
         return self.moderate_state == ModerateState.pending()
     pending = property(_pending)
+
+    def _published(self):
+        return self.moderate_state == ModerateState.published()
+    published = property(_published)
 
 reversion.register(Section)
