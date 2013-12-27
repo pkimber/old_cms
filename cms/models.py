@@ -56,6 +56,16 @@ class Page(models.Model):
 reversion.register(Page)
 
 
+class SectionManager(models.Manager):
+
+    def published(self, page):
+        return self.model.objects.filter(
+            page=page
+        ).order_by(
+            'order'
+        )
+
+
 class Section(TimeStampedModel):
     """Simple section on a web page."""
     page = models.ForeignKey(Page)
@@ -68,6 +78,7 @@ class Section(TimeStampedModel):
         ModerateState,
         default=_default_moderate_state
     )
+    objects = SectionManager()
 
     class Meta:
         ordering = ['page', 'order', 'modified']
