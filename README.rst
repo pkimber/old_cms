@@ -9,10 +9,8 @@ Install
 Virtual Environment
 -------------------
 
-Note: replace ``patrick`` with your name (checking in the ``example`` folder to make sure a file
-has been created for you).
-
-::
+Note: replace ``patrick`` with your name (checking in the ``example`` folder
+to make sure a file has been created for you)::
 
   mkvirtualenv dev_cms
   pip install -r requirements/local.txt
@@ -25,17 +23,13 @@ has been created for you).
   add2virtualenv .
   deactivate
 
-To check the order of the imports:
-
-::
+To check the order of the imports::
 
   workon dev_cms
   cdsitepackages
   cat _virtualenv_path_extensions.pth
 
-Check the imports are in the correct order e.g:
-
-::
+Check the imports are in the correct order e.g::
 
   /home/patrick/repo/dev/app/cms
   /home/patrick/repo/dev/app/login
@@ -44,17 +38,13 @@ Check the imports are in the correct order e.g:
 Testing
 =======
 
-Using ``pytest-django``:
-
-::
+Using ``pytest-django``::
 
   workon dev_cms
   find . -name '*.pyc' -delete
   py.test
 
-To stop on first failure:
-
-::
+To stop on first failure::
 
   py.test -x
 
@@ -64,11 +54,15 @@ Usage
 ::
 
   workon dev_cms
-  django-admin.py syncdb --noinput
-  django-admin.py migrate --all --noinput
-  django-admin.py demo_data_login
-  django-admin.py demo_data_cms
-  django-admin.py runserver
+
+  py.test -x && \
+      touch temp.db && rm temp.db && \
+      django-admin.py syncdb --noinput && \
+      django-admin.py migrate --all --noinput && \
+      django-admin.py demo_data_login && \
+      django-admin.py init_app_cms && \
+      django-admin.py demo_data_cms && \
+      django-admin.py runserver
 
 Release
 =======

@@ -10,6 +10,6 @@ admin.site.register(Section, SectionAdmin)
 
 
 class SimpleAdmin(admin.ModelAdmin):
-    list_display = ('section', 'order', 'title', 'moderated')
+    list_display = ('section', 'order', 'title', 'moderate_state')
 
 admin.site.register(Simple, SimpleAdmin)
