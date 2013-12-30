@@ -9,8 +9,6 @@ class TestCommand(TestCase):
 
     def test_demo_data(self):
         """ Test the management command """
-        pre_command = demo_data_login.Command()
-        pre_command.handle()
         command = demo_data_cms.Command()
         command.handle()
 

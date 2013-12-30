@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'cms',
     'example',
     'login',
+    'moderate',
 )
 
 # A sample logging configuration. The only tangible logging
