@@ -11,22 +11,9 @@ from moderate.models import (
 )
 
 
-#class PageManager(models.Manager):
-#
-#    def published(self, page):
-#        import ipdb
-#        ipdb.set_trace()
-#        return self.model.moderate.published().filter(
-#            page=page,
-#        ).order_by(
-#            'order'
-#        )
-
-
 class Page(models.Model):
     """Which page on the web site."""
     name = models.CharField(max_length=100)
-    #objects = PageManager()
 
     class Meta:
         ordering = ['name']
@@ -36,102 +23,15 @@ class Page(models.Model):
     def __unicode__(self):
         return unicode('{}'.format(self.name))
 
-    #def pending(self):
-    #    pending = ModerateState.pending()
-    #    published = ModerateState.published()
-    #    qs = self.section_set.filter(
-    #        version__moderate_state__in=[published, pending]
-    #    ).order_by(
-    #        'order',
-    #    )
-    #    result = {}
-    #    for version in qs:
-    #        if version.pk in result:
-    #            import ipdb
-    #            ipdb.set_trace()
-    #            if version.moderate_state == pending:
-    #                result[version.pk] = version
-    #        else:
-    #            result[version.pk] = version
-    #    return result.values()
-
-    #def published(self):
-    #    published = ModerateState.published()
-    #    return self.section_set.filter(
-    #        version__moderate_state=published
-    #    ).order_by(
-    #        'order',
-    #    )
-
 reversion.register(Page)
-
-
-#class SectionManager(models.Manager):
-#
-#    def pending(self, page):
-#        return self.model.moderate.pending().filter(
-#            page=page,
-#        ).order_by(
-#            'order',
-#            'moderate_state__slug',
-#        )
-#
-#    def published(self, page):
-#        import ipdb
-#        ipdb.set_trace()
-#        return self.model.moderate.published().filter(
-#            page=page,
-#        ).order_by(
-#            'order'
-#        )
-
-#
-#    def pending(self, page):
-#        published = ModerateState.published()
-#        pending = ModerateState.pending()
-#        sections = self.model.objects.filter(
-#            page=page,
-#            moderate_state__in=[published, pending],
-#        ).order_by(
-#            'order',
-#            'moderate_state__slug',
-#        )
-#        previous = None
-#        result = []
-#        for section in sections:
-#            if previous and section.order == previous:
-#                pass
-#            else:
-#                result.append(section)
-#            previous = section.order
-#        return result
-#
-#    def published(self, page):
-#        return self.model.objects.filter(
-#            page=page,
-#            moderate_state=ModerateState.published(),
-#        ).order_by(
-#            'order'
-#        )
 
 
 class Section(ModerateModel, TimeStampedModel):
     """Simple section on a web page."""
     page = models.ForeignKey(Page)
 
-
-
-    #order = models.IntegerField()
-    #title = models.TextField()
-    #description = models.TextField(blank=True, null=True)
-    #picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
-    #url = models.URLField(blank=True, null=True)
-    #objects = SectionManager()
-    #objects = models.Manager()
-
     class Meta:
         ordering = ['page', 'modified']
-        # unique_together = ('page', 'order', 'moderate_state')
         verbose_name = 'Section'
         verbose_name_plural = 'Sections'
 
@@ -185,10 +85,9 @@ class Content(ModerateModel, TimeStampedModel):
     picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
     url = models.URLField(blank=True, null=True)
     objects = ContentManager()
-    #objects = models.Manager()
 
     class Meta:
-        #ordering = ['page', 'order', 'modified']
+        ordering = ['section__page__name', 'order', 'moderate_state__slug']
         unique_together = ('section', 'moderate_state')
         verbose_name = 'Content'
         verbose_name_plural = 'Content'
@@ -197,6 +96,7 @@ class Content(ModerateModel, TimeStampedModel):
         return unicode('{} {}'.format(self.title, self.moderate_state))
 
     def _delete_removed_content(self):
+        """delete content which was previously removed."""
         try:
             content = self.section.content_set.get(
                 moderate_state=ModerateState.removed()
@@ -206,6 +106,7 @@ class Content(ModerateModel, TimeStampedModel):
             pass
 
     def _set_published_to_remove(self, user):
+        """publishing new content, so remove currently published content."""
         try:
             content = self.section.content_set.get(
                 moderate_state=ModerateState.published()
@@ -216,7 +117,7 @@ class Content(ModerateModel, TimeStampedModel):
             pass
 
     def publish(self, user):
-        """Publish this content."""
+        """Publish content."""
         if not self.moderate_state == ModerateState.pending():
             raise ModerateError(
                 "Cannot publish contene unless it is 'pending'"
@@ -227,7 +128,7 @@ class Content(ModerateModel, TimeStampedModel):
         self.save()
 
     def remove(self, user):
-        """Remove this content."""
+        """Remove content."""
         if self.moderate_state == ModerateState.removed():
             raise ModerateError(
                 "Cannot remove content which has already been removed"
