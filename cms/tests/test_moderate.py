@@ -33,6 +33,15 @@ class TestModerate(TestCase):
         default_scenario_login()
         default_scenario_cms()
 
+    def test_is_pending(self):
+        self.assertTrue(get_content_hatherleigh_three().is_pending)
+
+    def test_is_published(self):
+        self.assertTrue(get_content_hatherleigh_two().is_published)
+
+    def test_is_removed(self):
+        self.assertTrue(get_content_hatherleigh_old().is_removed)
+
     def test_two_pending_error(self):
         section = get_section()
         self.assertRaises(
