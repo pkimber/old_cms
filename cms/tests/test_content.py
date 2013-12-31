@@ -9,13 +9,13 @@ from cms.models import (
 from moderate.models import (
     ModerateState,
 )
-from moderate.tests.scenario import create_default_moderate_state
+from moderate.tests.scenario import default_moderate_state
 
 
 class TestContent(TestCase):
 
     def setUp(self):
-        create_default_moderate_state()
+        default_moderate_state()
         self.page = clean_and_save(
             Page(
                 name='home'

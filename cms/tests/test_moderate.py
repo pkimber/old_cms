@@ -4,9 +4,16 @@ from django.test import TestCase
 
 from base.tests.model_maker import clean_and_save
 from cms.models import (
-    Page,
-    Section,
     Content,
+)
+from cms.tests.scenario import (
+    default_scenario_cms,
+    get_content_hatherleigh_old,
+    get_content_hatherleigh_three,
+    get_content_hatherleigh_two,
+    get_content_jacobstowe_one,
+    get_page_home,
+    get_section,
 )
 from login.tests.scenario import (
     default_scenario_login,
@@ -16,124 +23,86 @@ from moderate.models import (
     ModerateError,
     ModerateState,
 )
-from moderate.tests.scenario import create_default_moderate_state
+from moderate.tests.scenario import default_moderate_state
 
 
 class TestModerate(TestCase):
 
     def setUp(self):
-        create_default_moderate_state()
+        default_moderate_state()
         default_scenario_login()
-        self.page = clean_and_save(
-            Page(
-                name='home'
-            )
-        )
-        self.section = clean_and_save(
-            Section(
-                page=self.page,
-            )
-        )
-        self.hatherleigh_one = clean_and_save(
-            Content(
-                section=self.section,
-                order=1,
-                moderate_state=ModerateState.pending(),
-                title='Hatherleigh One',
-            )
-        )
-        self.hatherleigh_two = clean_and_save(
-            Content(
-                section=self.section,
-                order=1,
-                moderate_state=ModerateState.published(),
-                title='Hatherleigh Two',
-            )
-        )
-        self.hatherleigh_old = clean_and_save(
-            Content(
-                section=self.section,
-                order=3,
-                moderate_state=ModerateState.removed(),
-                title='Hatherleigh Old',
-            )
-        )
-        # Jacobstowe
-        section2 = clean_and_save(
-            Section(
-                page=self.page,
-            )
-        )
-        self.jacobstowe_one = clean_and_save(
-            Content(
-                section=section2,
-                order=2,
-                moderate_state=ModerateState.published(),
-                title='Jacobstowe One',
-            )
-        )
+        default_scenario_cms()
 
     def test_two_pending_error(self):
+        section = get_section()
         self.assertRaises(
             IntegrityError,
             clean_and_save,
             Content(
-                section=self.section,
+                section=section,
                 moderate_state=ModerateState.pending(),
                 title='Hatherleigh 2',
             )
         )
 
     def test_published(self):
-        result = [c.title for c in Content.objects.published(page=self.page)]
+        page = get_page_home()
+        result = [c.title for c in Content.objects.published(page=page)]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
         )
 
     def test_pending(self):
-        result = [c.title for c in Content.objects.pending(page=self.page)]
+        page = get_page_home()
+        result = [c.title for c in Content.objects.pending(page=page)]
         self.assertListEqual(
-            ['Hatherleigh One', 'Jacobstowe One'],
+            ['Hatherleigh Three', 'Jacobstowe One'],
             result
         )
 
     def test_publish_not_pending(self):
         """This content is not 'pending' so cannot be published."""
+        content = get_content_hatherleigh_two()
         self.assertRaises(
             ModerateError,
-            self.hatherleigh_two.publish,
+            content.publish,
             get_user_staff(),
         )
 
     def test_publish(self):
-        self.hatherleigh_one.publish(get_user_staff())
-        self.hatherleigh_one.save()
+        content = get_content_hatherleigh_three()
+        content.publish(get_user_staff())
+        content.save()
+        page = get_page_home()
         result = list(
             Content.objects.published(
-                page=self.page
+                page=page
             ).values_list(
                 'title', flat=True
             )
         )
         self.assertListEqual(
-            ['Hatherleigh One', 'Jacobstowe One'],
+            ['Hatherleigh Three', 'Jacobstowe One'],
             result
         )
 
     def test_remove_already(self):
         """content has already been removed and cannot be removed again."""
+        content = get_content_hatherleigh_old()
         self.assertRaises(
             ModerateError,
-            self.hatherleigh_old.remove,
+            content.remove,
             get_user_staff(),
         )
 
     def test_remove_pending(self):
         """remove pending content."""
-        self.hatherleigh_one.remove(get_user_staff())
-        self.hatherleigh_one.save()
-        result = [c.title for c in Content.objects.pending(page=self.page)]
+        page = get_page_home()
+        content = get_content_hatherleigh_three()
+        content.remove(get_user_staff())
+        content.save()
+        result = [c.title for c in Content.objects.pending(page=page)]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
@@ -141,42 +110,48 @@ class TestModerate(TestCase):
 
     def test_remove_published(self):
         """remove pending content."""
-        self.hatherleigh_two.remove(get_user_staff())
-        self.hatherleigh_two.save()
-        result = [c.title for c in Content.objects.published(page=self.page)]
+        page = get_page_home()
+        content = get_content_hatherleigh_two()
+        content.remove(get_user_staff())
+        content.save()
+        result = [c.title for c in Content.objects.published(page=page)]
         self.assertListEqual(
             ['Jacobstowe One',],
             result
         )
 
-    def test_set_pending(self):
+    def test_pending_set(self):
         """edit published content."""
-        self.jacobstowe_one.title = 'Jacobstowe Edit'
-        self.jacobstowe_one.set_pending(get_user_staff())
-        self.jacobstowe_one.save()
-        result = [c.title for c in Content.objects.pending(page=self.page)]
+        content = get_content_jacobstowe_one()
+        content.title = 'Jacobstowe Edit'
+        content.pending(get_user_staff())
+        content.save()
+        page = get_page_home()
+        result = [c.title for c in Content.objects.pending(page=page)]
         self.assertListEqual(
-            ['Hatherleigh One', 'Jacobstowe Edit'],
+            ['Hatherleigh Three', 'Jacobstowe Edit'],
             result
         )
 
-    def test_set_pending_when_pending_exists(self):
+    def test_pending_when_pending_exists(self):
         """edit published content when content already pending.
 
         user should not be allowed to edit published content when pending
         content already exists in the section.
 
         """
+        content = get_content_hatherleigh_two()
         self.assertRaises(
             ModerateError,
-            self.hatherleigh_two.set_pending,
+            content.pending,
             get_user_staff()
         )
 
-    def test_set_pending_when_removed(self):
+    def test_pending_when_removed(self):
         """content has been removed, so cannot set to pending."""
+        content = get_content_hatherleigh_old()
         self.assertRaises(
             ModerateError,
-            self.hatherleigh_old.set_pending,
+            content.pending,
             get_user_staff()
         )
