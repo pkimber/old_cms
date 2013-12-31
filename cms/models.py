@@ -122,12 +122,12 @@ class Content(ModerateModel, TimeStampedModel):
             content = self.section.content_set.get(
                 moderate_state=ModerateState.published()
             )
-            content._set_removed(user)
+            content.set_removed(user)
             content.save()
         except Content.DoesNotExist:
             pass
 
-    def set_pending(self, user):
+    def pending(self, user):
         if self.moderate_state == ModerateState.published():
             try:
                 self.section.content_set.get(
@@ -138,7 +138,7 @@ class Content(ModerateModel, TimeStampedModel):
                     "published content should not be edited."
                 )
             except Content.DoesNotExist:
-                self._set_pending(user)
+                self.set_pending(user)
                 self.pk = None
         elif self.moderate_state == ModerateState.pending():
             return
@@ -155,7 +155,7 @@ class Content(ModerateModel, TimeStampedModel):
             )
         self._delete_removed_content()
         self._set_published_to_remove(user)
-        self._set_published(user)
+        self.set_published(user)
 
     def remove(self, user):
         """Remove content."""
@@ -164,6 +164,6 @@ class Content(ModerateModel, TimeStampedModel):
                 "Cannot remove content which has already been removed"
             )
         self._delete_removed_content()
-        self._set_removed(user)
+        self.set_removed(user)
 
 reversion.register(Content)
