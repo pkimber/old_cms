@@ -4,28 +4,28 @@ from base.form_utils import (
     RequiredFieldForm,
 )
 from .models import (
-    Section,
+    Content,
 )
 
 
-class SectionEmptyForm(forms.ModelForm):
+class ContentEmptyForm(forms.ModelForm):
 
     class Meta:
-        model = Section
+        model = Content
         fields = ()
 
 
-class SectionForm(RequiredFieldForm):
+class ContentForm(RequiredFieldForm):
 
     def __init__(self, *args, **kwargs):
-        super(SectionForm, self).__init__(*args, **kwargs)
+        super(ContentForm, self).__init__(*args, **kwargs)
         for name in ('title', 'description'):
             self.fields[name].widget.attrs.update(
                 {'class': 'pure-input-2-3'}
             )
 
     class Meta:
-        model = Section
+        model = Content
         fields = (
             'title',
             'description',

@@ -36,12 +36,23 @@ class Section(ModerateModel, TimeStampedModel):
         verbose_name_plural = 'Sections'
 
     def __unicode__(self):
-        return unicode('{} {}'.format(self.page.name, self.order))
+        return unicode('{}'.format(self.page.name))
 
 reversion.register(Section)
 
 
 class ContentManager(models.Manager):
+
+    def next_order(self, page):
+        content = self.model.objects.filter(
+            section__page=page,
+        ).order_by(
+            '-order'
+        )[:1]
+        if content:
+            return content[0].order + 1
+        else:
+            return 1
 
     def pending(self, page):
         """Return a list of pending content for a page.
@@ -116,16 +127,35 @@ class Content(ModerateModel, TimeStampedModel):
         except Content.DoesNotExist:
             pass
 
+    def set_pending(self, user):
+        if self.moderate_state == ModerateState.published():
+            try:
+                self.section.content_set.get(
+                    moderate_state=ModerateState.pending()
+                )
+                raise ModerateError(
+                    "Section already has pending content so "
+                    "published content should not be edited."
+                )
+            except Content.DoesNotExist:
+                self._set_pending(user)
+                self.pk = None
+        elif self.moderate_state == ModerateState.pending():
+            return
+        else:
+            raise ModerateError(
+                "Cannot edit content which has been removed"
+            )
+
     def publish(self, user):
         """Publish content."""
         if not self.moderate_state == ModerateState.pending():
             raise ModerateError(
-                "Cannot publish contene unless it is 'pending'"
+                "Cannot publish content unless it is 'pending'"
             )
         self._delete_removed_content()
         self._set_published_to_remove(user)
         self._set_published(user)
-        self.save()
 
     def remove(self, user):
         """Remove content."""
@@ -135,6 +165,5 @@ class Content(ModerateModel, TimeStampedModel):
             )
         self._delete_removed_content()
         self._set_removed(user)
-        self.save()
 
 reversion.register(Content)
