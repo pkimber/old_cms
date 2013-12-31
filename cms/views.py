@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import (
     CreateView,
