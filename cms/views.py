@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import (
     CreateView,
+    UpdateView,
 )
 
 from braces.views import (
@@ -37,3 +38,51 @@ class ContentCreateView(
         self.object.section = section
         self.object.order = Content.objects.next_order(page)
         return super(ContentCreateView, self).form_valid(form)
+
+
+class ContentPublishView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    model = Content
+
+    def form_valid(self, form):
+        """Publish 'pending' content."""
+        self.object = form.save(commit=False)
+        self.object.publish(self.request.user)
+        messages.info(
+            self.request,
+            "Published content {}, {}".format(
+                self.object.pk,
+                self.object.title,
+            )
+        )
+        return super(ContentPublishView, self).form_valid(form)
+
+
+class ContentRemoveView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    model = Content
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.remove(self.request.user)
+        messages.info(
+            self.request,
+            "Removed content {}, {}".format(
+                self.object.pk,
+                self.object.title,
+            )
+        )
+        return super(ContentRemoveView, self).form_valid(form)
+
+
+class ContentUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    model = Content
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.pending(self.request.user)
+        return super(ContentUpdateView, self).form_valid(form)
