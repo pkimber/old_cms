@@ -21,7 +21,7 @@ class TestContent(TestCase):
 
     def setUp(self):
         default_moderate_state()
-        self.page = make_page(name='home')
+        self.page = make_page('home', 0)
         self.section = make_section(self.page)
         make_content(
             self.section, 1, ModerateState.published(), 'Hatherleigh'

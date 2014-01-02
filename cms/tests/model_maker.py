@@ -20,9 +20,10 @@ def make_content(section, order, moderate_state, title, **kwargs):
     return clean_and_save(Content(**defaults))
 
 
-def make_page(name, **kwargs):
+def make_page(name, order, **kwargs):
     defaults = dict(
         name=name,
+        order=order,
         slug=slugify(unicode(name)),
     )
     defaults.update(kwargs)

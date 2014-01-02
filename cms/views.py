@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView,
     UpdateView,
@@ -13,21 +14,32 @@ from braces.views import (
 from base.view_utils import BaseMixin
 from cms.models import (
     Content,
+    Page,
     Section,
 )
 
 
-class ContentCreateView(
-        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
+class ContentPageMixin(object):
+    """Page information."""
 
-    model = Content
+    def get_context_data(self, **kwargs):
+        context = super(ContentPageMixin, self).get_context_data(**kwargs)
+        context.update(dict(
+            page=self.get_page(),
+            pages=Page.objects.menu(),
+        ))
+        return context
 
     def get_page(self):
-        raise ImproperlyConfigured(
-            "{} is missing a 'get_page' method.".format(
-                self.__class__.__name__
-            )
-        )
+        slug = self.kwargs.get('slug', None)
+        return get_object_or_404(Page, slug=slug)
+
+
+class ContentCreateView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        ContentPageMixin, BaseMixin, CreateView):
+
+    model = Content
 
     def form_valid(self, form):
         self.object = form.save(commit=False)

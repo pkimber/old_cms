@@ -33,11 +33,11 @@ def get_content_jacobstowe_one():
 
 
 def get_page_home():
-    return Page.objects.get(name='home')
+    return Page.objects.get(slug='home')
 
 
 def get_page_information():
-    return Page.objects.get(name='information')
+    return Page.objects.get(slug='information')
 
 
 def get_section():
@@ -46,7 +46,7 @@ def get_section():
 
 def default_scenario_cms():
     default_moderate_state()
-    page = make_page('home')
+    page = make_page('Home', 0)
     section = make_section(page=page)
     make_content(section, 1, ModerateState.pending(), 'Hatherleigh Three')
     make_content(section, 1, ModerateState.published(), 'Hatherleigh Two')
@@ -55,6 +55,6 @@ def default_scenario_cms():
     section2 = make_section(page=page)
     make_content(section2, 2, ModerateState.published(), 'Jacobstowe One')
     # Information page
-    page_info = make_page('information')
+    page_info = make_page('Information', 1)
     section_info = make_section(page_info)
     make_content(section_info, 1, ModerateState.published(), 'Monkokehampton')

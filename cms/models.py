@@ -11,10 +11,27 @@ from moderate.models import (
 )
 
 
+class PageManager(models.Manager):
+
+    def menu(self):
+        """Return page objects for a menu."""
+        return self.model.objects.filter(
+            order__gt=0
+        ).order_by(
+            'order'
+        )
+
+
 class Page(models.Model):
-    """Which page on the web site."""
+    """Which page on the web site.
+
+    An order of zero (0) indicates that the page should be excluded from a
+    menu.
+    """
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
+    order = models.IntegerField(default=0)
+    objects = PageManager()
 
     class Meta:
         ordering = ['name']

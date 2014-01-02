@@ -10,15 +10,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            Page.objects.get(name='home')
+            Page.objects.get(slug='home')
         except Page.DoesNotExist:
-            make_page('home')
+            make_page('Home', 0)
         try:
-            Page.objects.get(name='portfolio')
+            Page.objects.get(slug='information')
         except Page.DoesNotExist:
-            make_page('portfolio')
+            make_page('Information', 1)
         try:
-            Page.objects.get(name='tech')
+            Page.objects.get(slug='portfolio')
         except Page.DoesNotExist:
-            make_page('tech')
+            make_page('Portfolio', 2)
         print("Created 'cms' demo data...")
