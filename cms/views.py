@@ -13,7 +13,10 @@ from braces.views import (
 
 from base.view_utils import BaseMixin
 from cms.models import (
+    CmsError,
+    Container,
     Content,
+    Layout,
     Page,
     Section,
 )
@@ -30,9 +33,24 @@ class ContentPageMixin(object):
         ))
         return context
 
+    def get_layout(self):
+        layout = self.kwargs.get('layout', None)
+        if not layout:
+            raise CmsError("no 'layout' parameter in url")
+        return get_object_or_404(Layout, slug=layout)
+
     def get_page(self):
-        slug = self.kwargs.get('slug', None)
-        return get_object_or_404(Page, slug=slug)
+        page = self.kwargs.get('page', None)
+        if not page:
+            raise CmsError("no 'page' parameter in url")
+        return get_object_or_404(Page, slug=page)
+
+    def get_section(self):
+        return get_object_or_404(
+            Section,
+            page=self.get_page(),
+            layout=self.get_layout()
+        )
 
 
 class ContentCreateView(
@@ -43,13 +61,13 @@ class ContentCreateView(
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        page = self.get_page()
-        # create a new section for this content
-        section = Section(page=page)
-        section.save()
+        # create a new container for this content
+        section = self.get_section()
+        container = Container(section=section)
+        container.save()
         # init our new content object
-        self.object.section = section
-        self.object.order = Content.objects.next_order(page)
+        self.object.container = container
+        self.object.order = Content.objects.next_order(container.section)
         return super(ContentCreateView, self).form_valid(form)
 
 

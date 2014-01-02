@@ -13,7 +13,7 @@ from cms.tests.scenario import (
     get_content_hatherleigh_two,
     get_content_jacobstowe_one,
     get_page_home,
-    get_section,
+    get_container_hatherleigh_two,
 )
 from login.tests.scenario import (
     default_scenario_login,
@@ -43,12 +43,12 @@ class TestModerate(TestCase):
         self.assertTrue(get_content_hatherleigh_old().is_removed)
 
     def test_two_pending_error(self):
-        section = get_section()
+        container = get_container_hatherleigh_two()
         self.assertRaises(
             IntegrityError,
             clean_and_save,
             Content(
-                section=section,
+                container=container,
                 moderate_state=ModerateState.pending(),
                 title='Hatherleigh 2',
             )

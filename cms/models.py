@@ -11,6 +11,17 @@ from moderate.models import (
 )
 
 
+class CmsError(Exception):
+
+    def __init__(self, value):
+        Exception.__init__(self)
+        self.value = value
+
+    def __str__(self):
+        return repr('%s, %s' % (self.__class__.__name__, self.value))
+
+
+
 class PageManager(models.Manager):
 
     def menu(self):
@@ -44,12 +55,30 @@ class Page(models.Model):
 reversion.register(Page)
 
 
+class Layout(models.Model):
+    """Layout area e.g. content, header, footer."""
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Layout'
+        verbose_name_plural = 'Layout'
+
+    def __unicode__(self):
+        return unicode('{}'.format(self.name))
+
+reversion.register(Layout)
+
+
 class Section(ModerateModel, TimeStampedModel):
-    """Simple section on a web page."""
+    """Section of a web page e.g. content, header, footer."""
     page = models.ForeignKey(Page)
+    layout = models.ForeignKey(Layout)
 
     class Meta:
         ordering = ['page', 'modified']
+        unique_together = ('page', 'layout')
         verbose_name = 'Section'
         verbose_name_plural = 'Sections'
 
@@ -59,11 +88,29 @@ class Section(ModerateModel, TimeStampedModel):
 reversion.register(Section)
 
 
+class Container(ModerateModel, TimeStampedModel):
+    """Manage one piece of content which can be in various states.
+
+    e.g. pending, published and removed.
+
+    """
+    section = models.ForeignKey(Section)
+
+    class Meta:
+        verbose_name = 'Container'
+        verbose_name_plural = 'Containers'
+
+    def __unicode__(self):
+        return unicode('{}'.format(self.section.page.name))
+
+reversion.register(Container)
+
+
 class ContentManager(models.Manager):
 
-    def next_order(self, page):
+    def next_order(self, section):
         content = self.model.objects.filter(
-            section__page=page,
+            container__section=section,
         ).order_by(
             '-order'
         )[:1]
@@ -76,29 +123,30 @@ class ContentManager(models.Manager):
         """Return a list of pending content for a page.
 
         Note: we return a list of content not a queryset.
+
         """
         pending = ModerateState.pending()
         published = ModerateState.published()
         qs = self.model.objects.filter(
-            section__page=page,
+            container__section__page=page,
             moderate_state__in=[published, pending],
         ).order_by(
             'order',
         )
         result = {}
         for content in qs:
-            if content.section.pk in result:
+            if content.container.pk in result:
                 if content.moderate_state == pending:
-                    result[content.section.pk] = content
+                    result[content.container.pk] = content
             else:
-                result[content.section.pk] = content
+                result[content.container.pk] = content
         return result.values()
 
     def published(self, page):
         """Return a published content for a page."""
         published = ModerateState.published()
         return self.model.objects.filter(
-            section__page=page,
+            container__section__page=page,
             moderate_state=published,
         ).order_by(
             'order',
@@ -107,7 +155,8 @@ class ContentManager(models.Manager):
 
 class Content(ModerateModel, TimeStampedModel):
     """Simple section on a web page."""
-    section = models.ForeignKey(Section)
+    #section = models.ForeignKey(Section)
+    container = models.ForeignKey(Container)
     order = models.IntegerField()
     title = models.TextField()
     description = models.TextField(blank=True, null=True)
@@ -117,7 +166,7 @@ class Content(ModerateModel, TimeStampedModel):
 
     class Meta:
         ordering = ['section__page__name', 'order', 'moderate_state__slug']
-        unique_together = ('section', 'moderate_state')
+        unique_together = ('container', 'moderate_state')
         verbose_name = 'Content'
         verbose_name_plural = 'Content'
 
@@ -127,7 +176,7 @@ class Content(ModerateModel, TimeStampedModel):
     def _delete_removed_content(self):
         """delete content which was previously removed."""
         try:
-            content = self.section.content_set.get(
+            content = self.container.content_set.get(
                 moderate_state=ModerateState.removed()
             )
             content.delete()
@@ -137,7 +186,7 @@ class Content(ModerateModel, TimeStampedModel):
     def _set_published_to_remove(self, user):
         """publishing new content, so remove currently published content."""
         try:
-            content = self.section.content_set.get(
+            content = self.container.content_set.get(
                 moderate_state=ModerateState.published()
             )
             content.set_removed(user)
@@ -148,7 +197,7 @@ class Content(ModerateModel, TimeStampedModel):
     def pending(self, user):
         if self.moderate_state == ModerateState.published():
             try:
-                self.section.content_set.get(
+                self.container.content_set.get(
                     moderate_state=ModerateState.pending()
                 )
                 raise ModerateError(
