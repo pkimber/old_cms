@@ -14,6 +14,7 @@ from moderate.models import (
 class Page(models.Model):
     """Which page on the web site."""
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
         ordering = ['name']
