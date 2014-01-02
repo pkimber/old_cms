@@ -6,6 +6,11 @@ from cms.models import (
     Section,
     Content,
 )
+from cms.tests.model_maker import (
+    make_content,
+    make_page,
+    make_section,
+)
 from moderate.models import (
     ModerateState,
 )
@@ -16,31 +21,13 @@ class TestContent(TestCase):
 
     def setUp(self):
         default_moderate_state()
-        self.page = clean_and_save(
-            Page(
-                name='home'
-            )
+        self.page = make_page(name='home')
+        self.section = make_section(self.page)
+        make_content(
+            self.section, 1, ModerateState.published(), 'Hatherleigh'
         )
-        self.section = clean_and_save(
-            Section(
-                page=self.page,
-            )
-        )
-        clean_and_save(
-            Content(
-                section=self.section,
-                order=1,
-                moderate_state=ModerateState.published(),
-                title='Hatherleigh',
-            )
-        )
-        clean_and_save(
-            Content(
-                section=self.section,
-                order=3,
-                moderate_state=ModerateState.pending(),
-                title='Hatherleigh Pending',
-            )
+        make_content(
+            self.section, 3, ModerateState.pending(), 'Hatherleigh Pending'
         )
 
     def test_next_order(self):

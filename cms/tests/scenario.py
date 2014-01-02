@@ -4,6 +4,11 @@ from cms.models import (
     Section,
     Content,
 )
+from cms.tests.model_maker import (
+    make_content,
+    make_page,
+    make_section,
+)
 from moderate.models import (
     ModerateError,
     ModerateState,
@@ -31,57 +36,25 @@ def get_page_home():
     return Page.objects.get(name='home')
 
 
+def get_page_information():
+    return Page.objects.get(name='information')
+
+
 def get_section():
     return get_content_hatherleigh_two().section
 
 
 def default_scenario_cms():
     default_moderate_state()
-    page = clean_and_save(
-        Page(
-            name='home'
-        )
-    )
-    section = clean_and_save(
-        Section(
-            page=page,
-        )
-    )
-    clean_and_save(
-        Content(
-            section=section,
-            order=1,
-            moderate_state=ModerateState.pending(),
-            title='Hatherleigh Three',
-        )
-    )
-    clean_and_save(
-        Content(
-            section=section,
-            order=1,
-            moderate_state=ModerateState.published(),
-            title='Hatherleigh Two',
-        )
-    )
-    clean_and_save(
-        Content(
-            section=section,
-            order=3,
-            moderate_state=ModerateState.removed(),
-            title='Hatherleigh Old',
-        )
-    )
+    page = make_page('home')
+    section = make_section(page=page)
+    make_content(section, 1, ModerateState.pending(), 'Hatherleigh Three')
+    make_content(section, 1, ModerateState.published(), 'Hatherleigh Two')
+    make_content(section, 3, ModerateState.removed(), 'Hatherleigh Old')
     # Jacobstowe
-    section2 = clean_and_save(
-        Section(
-            page=page,
-        )
-    )
-    clean_and_save(
-        Content(
-            section=section2,
-            order=2,
-            moderate_state=ModerateState.published(),
-            title='Jacobstowe One',
-        )
-    )
+    section2 = make_section(page=page)
+    make_content(section2, 2, ModerateState.published(), 'Jacobstowe One')
+    # Information page
+    page_info = make_page('information')
+    section_info = make_section(page_info)
+    make_content(section_info, 1, ModerateState.published(), 'Monkokehampton')

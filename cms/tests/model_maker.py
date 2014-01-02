@@ -1,26 +1,38 @@
+from django.utils.text import slugify
+
 from base.tests.model_maker import clean_and_save
 
 from cms.models import (
+    Content,
     Page,
     Section,
 )
 
 
+def make_content(section, order, moderate_state, title, **kwargs):
+    defaults = dict(
+        section=section,
+        order=order,
+        moderate_state=moderate_state,
+        title=title,
+    )
+    defaults.update(kwargs)
+    return clean_and_save(Content(**defaults))
+
+
 def make_page(name, **kwargs):
-    return clean_and_save(
-        Page(
-            name=name,
-            **kwargs
-        )
+    defaults = dict(
+        name=name,
+        slug=slugify(unicode(name)),
     )
+    defaults.update(kwargs)
+    return clean_and_save(Page(**defaults))
 
 
-def make_section(section, order, title, **kwargs):
-    return clean_and_save(
-        Section(
-            section=section,
-            order=order,
-            title=title,
-            **kwargs
-        )
+def make_section(page, **kwargs):
+    defaults = dict(
+        page=page,
+        **kwargs
     )
+    defaults.update(kwargs)
+    return clean_and_save(Section(**defaults))
