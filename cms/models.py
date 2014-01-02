@@ -33,7 +33,7 @@ class PageManager(models.Manager):
         )
 
 
-class Page(models.Model):
+class Page(TimeStampedModel):
     """Which page on the web site.
 
     An order of zero (0) indicates that the page should be excluded from a
@@ -55,7 +55,7 @@ class Page(models.Model):
 reversion.register(Page)
 
 
-class Layout(models.Model):
+class Layout(TimeStampedModel):
     """Layout area e.g. content, header, footer."""
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
@@ -71,7 +71,7 @@ class Layout(models.Model):
 reversion.register(Layout)
 
 
-class Section(ModerateModel, TimeStampedModel):
+class Section(TimeStampedModel):
     """Section of a web page e.g. content, header, footer."""
     page = models.ForeignKey(Page)
     layout = models.ForeignKey(Layout)
@@ -88,7 +88,7 @@ class Section(ModerateModel, TimeStampedModel):
 reversion.register(Section)
 
 
-class Container(ModerateModel, TimeStampedModel):
+class Container(TimeStampedModel):
     """Manage one piece of content which can be in various states.
 
     e.g. pending, published and removed.
@@ -155,7 +155,6 @@ class ContentManager(models.Manager):
 
 class Content(ModerateModel, TimeStampedModel):
     """Simple section on a web page."""
-    #section = models.ForeignKey(Section)
     container = models.ForeignKey(Container)
     order = models.IntegerField()
     title = models.TextField()
