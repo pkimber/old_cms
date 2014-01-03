@@ -32,11 +32,7 @@ class Migration(DataMigration):
             name='Body',
             slug=slugify(unicode('body')),
         ))
-        import ipdb
-        ipdb.set_trace()
         for page in orm.Page.objects.all():
-            print page.slug
-            print body.slug
             clean_and_save(orm.Section(
                 page=page,
                 layout=body,
