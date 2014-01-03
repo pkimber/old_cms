@@ -8,12 +8,13 @@ from cms.models import (
 )
 from cms.tests.scenario import (
     default_scenario_cms,
+    get_container_hatherleigh_two,
     get_content_hatherleigh_old,
     get_content_hatherleigh_three,
     get_content_hatherleigh_two,
     get_content_jacobstowe_one,
+    get_layout_body,
     get_page_home,
-    get_container_hatherleigh_two,
 )
 from login.tests.scenario import (
     default_scenario_login,
@@ -56,7 +57,8 @@ class TestModerate(TestCase):
 
     def test_published(self):
         page = get_page_home()
-        result = [c.title for c in Content.objects.published(page=page)]
+        layout = get_layout_body()
+        result = [c.title for c in Content.objects.published(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
@@ -64,7 +66,8 @@ class TestModerate(TestCase):
 
     def test_pending(self):
         page = get_page_home()
-        result = [c.title for c in Content.objects.pending(page=page)]
+        layout = get_layout_body()
+        result = [c.title for c in Content.objects.pending(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Three', 'Jacobstowe One'],
             result
@@ -84,9 +87,10 @@ class TestModerate(TestCase):
         content.publish(get_user_staff())
         content.save()
         page = get_page_home()
+        layout = get_layout_body()
         result = list(
             Content.objects.published(
-                page=page
+                page, layout
             ).values_list(
                 'title', flat=True
             )
@@ -108,10 +112,11 @@ class TestModerate(TestCase):
     def test_remove_pending(self):
         """remove pending content."""
         page = get_page_home()
+        layout = get_layout_body()
         content = get_content_hatherleigh_three()
         content.remove(get_user_staff())
         content.save()
-        result = [c.title for c in Content.objects.pending(page=page)]
+        result = [c.title for c in Content.objects.pending(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
@@ -120,10 +125,11 @@ class TestModerate(TestCase):
     def test_remove_published(self):
         """remove pending content."""
         page = get_page_home()
+        layout = get_layout_body()
         content = get_content_hatherleigh_two()
         content.remove(get_user_staff())
         content.save()
-        result = [c.title for c in Content.objects.published(page=page)]
+        result = [c.title for c in Content.objects.published(page, layout)]
         self.assertListEqual(
             ['Jacobstowe One',],
             result
@@ -136,7 +142,8 @@ class TestModerate(TestCase):
         content.pending(get_user_staff())
         content.save()
         page = get_page_home()
-        result = [c.title for c in Content.objects.pending(page=page)]
+        layout = get_layout_body()
+        result = [c.title for c in Content.objects.pending(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Three', 'Jacobstowe Edit'],
             result

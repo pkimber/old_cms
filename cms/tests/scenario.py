@@ -57,20 +57,34 @@ def default_scenario_cms():
     body = make_layout('Body')
     footer = make_layout('Footer')
     section = make_section(page, body)
-    container = make_container(section)
-    make_content(container, 1, ModerateState.pending(), 'Hatherleigh Three')
-    make_content(container, 1, ModerateState.published(), 'Hatherleigh Two')
-    make_content(container, 3, ModerateState.removed(), 'Hatherleigh Old')
-    # Jacobstowe
-    section2 = make_section(page, footer)
-    container2 = make_container(section2)
-    make_content(container2, 2, ModerateState.published(), 'Jacobstowe One')
-    # Information page
+    # Home, Hatherleigh
+    container_hatherleigh = make_container(section)
+    make_content(
+        container_hatherleigh, 1, ModerateState.pending(), 'Hatherleigh Three'
+    )
+    make_content(
+        container_hatherleigh, 1, ModerateState.published(), 'Hatherleigh Two'
+    )
+    make_content(
+        container_hatherleigh, 3, ModerateState.removed(), 'Hatherleigh Old'
+    )
+    # Home, Jacobstowe
+    container_jacobstowe = make_container(section)
+    make_content(
+        container_jacobstowe, 2, ModerateState.published(), 'Jacobstowe One'
+    )
+    # Home, Footer
+    home_footer = make_section(page, footer)
+    container_footer = make_container(home_footer)
+    make_content(
+        container_footer, 1, ModerateState.published(), 'Villages for You'
+    )
+    # Information, Monkokehampton
     page_info = make_page('Information', 1)
     section_info = make_section(page_info, body)
-    container_info = make_container(section_info)
+    container_monkokehampton = make_container(section_info)
     make_content(
-        container_info,
+        container_monkokehampton,
         1,
         ModerateState.published(),
         'Monkokehampton'

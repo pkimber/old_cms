@@ -119,7 +119,7 @@ class ContentManager(models.Manager):
         else:
             return 1
 
-    def pending(self, page):
+    def pending(self, page, layout):
         """Return a list of pending content for a page.
 
         Note: we return a list of content not a queryset.
@@ -129,6 +129,7 @@ class ContentManager(models.Manager):
         published = ModerateState.published()
         qs = self.model.objects.filter(
             container__section__page=page,
+            container__section__layout=layout,
             moderate_state__in=[published, pending],
         ).order_by(
             'order',
@@ -142,11 +143,12 @@ class ContentManager(models.Manager):
                 result[content.container.pk] = content
         return result.values()
 
-    def published(self, page):
+    def published(self, page, layout):
         """Return a published content for a page."""
         published = ModerateState.published()
         return self.model.objects.filter(
             container__section__page=page,
+            container__section__layout=layout,
             moderate_state=published,
         ).order_by(
             'order',
