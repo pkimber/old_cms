@@ -1,0 +1,17 @@
+<!-- <strong>[{{ content.moderate_state }}]</strong> -->
+{% if content.is_pending %}
+  <a class="pure-button pure-button-xsmall" href="{% url 'project.content.publish' content.pk %}">
+    <i class="fa fa-check"></i>
+    publish
+  </a>
+{% endif %}
+<a class="pure-button pure-button-xsmall" href="{% url 'project.content.update' content.pk %}">
+  <i class="fa fa-edit"></i>
+  edit
+</a>
+<a class="pure-button pure-button-xsmall" href="{% url 'project.content.remove' content.pk %}">
+  <i class="fa fa-times"></i>
+  remove
+</a>
+</p>
+

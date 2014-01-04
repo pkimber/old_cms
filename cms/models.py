@@ -166,7 +166,7 @@ class Content(ModerateModel, TimeStampedModel):
     objects = ContentManager()
 
     class Meta:
-        ordering = ['section__page__name', 'order', 'moderate_state__slug']
+        ordering = ['container__section__page__name', 'order', 'moderate_state__slug']
         unique_together = ('container', 'moderate_state')
         verbose_name = 'Content'
         verbose_name_plural = 'Content'
