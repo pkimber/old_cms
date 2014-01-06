@@ -140,13 +140,6 @@ class ContentUpdateView(
         content.save()
         if is_new_content:
             self.object.content = content
-        #import ipdb
-        #ipdb.set_trace()
-        #self.object.content.set_pending(self.request.user)
-        #if not self.object.content.pk:
-        #    self.object.pk = None
-        #self.object.content.save()
-        #self.object.content = temp
         return super(ContentUpdateView, self).form_valid(form)
 
     def get_success_url(self):

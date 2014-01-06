@@ -22,7 +22,6 @@ class CmsError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
-
 class PageManager(models.Manager):
 
     def menu(self):
@@ -251,48 +250,3 @@ class GenericContentModel(TimeStampedModel):
 
     def url_update(self):
         raise ModerateError("class must implement 'url_update' method")
-
-
-class SimpleContent(GenericContentModel):
-    content = models.OneToOneField(Content)
-    title = models.TextField()
-    description = models.TextField(blank=True, null=True)
-    picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
-    url = models.URLField(blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'Simple content'
-        verbose_name_plural = 'Simple content'
-
-    def __unicode__(self):
-        return unicode('{} {}'.format(self.title, self.content.moderate_state))
-
-    def url_publish(self):
-        return reverse('project.simple.content.publish', kwargs={'pk': self.pk})
-
-    def url_remove(self):
-        return reverse('project.simple.content.remove', kwargs={'pk': self.pk})
-
-    def url_update(self):
-        return reverse('project.simple.content.update', kwargs={'pk': self.pk})
-
-
-class TextContent(GenericContentModel):
-    content = models.OneToOneField(Content)
-    title = models.TextField()
-
-    class Meta:
-        verbose_name = 'Text content'
-        verbose_name_plural = 'Text content'
-
-    def __unicode__(self):
-        return unicode('{} {}'.format(self.title, self.content.moderate_state))
-
-    def url_publish(self):
-        return reverse('project.text.content.publish', kwargs={'pk': self.pk})
-
-    def url_remove(self):
-        return reverse('project.text.content.remove', kwargs={'pk': self.pk})
-
-    def url_update(self):
-        return reverse('project.text.content.update', kwargs={'pk': self.pk})

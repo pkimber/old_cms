@@ -5,7 +5,6 @@ from cms.models import (
     Content,
     Page,
     Section,
-    SimpleContent,
 )
 from cms.tests.model_maker import (
     make_container,
@@ -13,7 +12,6 @@ from cms.tests.model_maker import (
     make_layout,
     make_page,
     make_section,
-    make_simple_content,
 )
 from moderate.models import (
     ModerateState,
@@ -29,14 +27,8 @@ class TestContent(TestCase):
         body = make_layout('body')
         self.section = make_section(page, body)
         container = make_container(self.section)
-        make_simple_content(
-            make_content(container, 1, ModerateState.published()),
-            'Hatherleigh'
-        )
-        make_simple_content(
-            make_content(container, 3, ModerateState.pending()),
-            'Hatherleigh Pending'
-        )
+        make_content(container, 1, ModerateState.published())
+        make_content(container, 3, ModerateState.pending())
 
     def test_next_order(self):
         self.assertGreater(Content.objects.next_order(self.section), 3)
