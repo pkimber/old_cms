@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 
@@ -235,14 +236,29 @@ class GenericContentManager(models.Manager):
         )
 
 
+class GenericContentModel(TimeStampedModel):
 
-class SimpleContent(TimeStampedModel):
+    objects = GenericContentManager()
+
+    class Meta:
+        abstract = True
+
+    def url_publish(self):
+        raise ModerateError("class must implement 'url_publish' method")
+
+    def url_remove(self):
+        raise ModerateError("class must implement 'url_remove' method")
+
+    def url_update(self):
+        raise ModerateError("class must implement 'url_update' method")
+
+
+class SimpleContent(GenericContentModel):
     content = models.OneToOneField(Content)
     title = models.TextField()
     description = models.TextField(blank=True, null=True)
     picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
     url = models.URLField(blank=True, null=True)
-    objects = GenericContentManager()
 
     class Meta:
         verbose_name = 'Simple content'
@@ -251,11 +267,19 @@ class SimpleContent(TimeStampedModel):
     def __unicode__(self):
         return unicode('{} {}'.format(self.title, self.content.moderate_state))
 
+    def url_publish(self):
+        return reverse('project.simple.content.publish', kwargs={'pk': self.pk})
 
-class TextContent(TimeStampedModel):
+    def url_remove(self):
+        return reverse('project.simple.content.remove', kwargs={'pk': self.pk})
+
+    def url_update(self):
+        return reverse('project.simple.content.update', kwargs={'pk': self.pk})
+
+
+class TextContent(GenericContentModel):
     content = models.OneToOneField(Content)
     title = models.TextField()
-    objects = GenericContentManager()
 
     class Meta:
         verbose_name = 'Text content'
@@ -263,3 +287,12 @@ class TextContent(TimeStampedModel):
 
     def __unicode__(self):
         return unicode('{} {}'.format(self.title, self.content.moderate_state))
+
+    def url_publish(self):
+        return reverse('project.text.content.publish', kwargs={'pk': self.pk})
+
+    def url_remove(self):
+        return reverse('project.text.content.remove', kwargs={'pk': self.pk})
+
+    def url_update(self):
+        return reverse('project.text.content.update', kwargs={'pk': self.pk})

@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView,
@@ -71,6 +72,13 @@ class ContentCreateView(
         self.object.content = content
         return super(ContentCreateView, self).form_valid(form)
 
+    def get_success_url(self):
+        page = self.get_page()
+        return reverse(
+            'project.page.design',
+            kwargs=dict(page=page.slug)
+        )
+
 
 class ContentPublishView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
@@ -78,7 +86,7 @@ class ContentPublishView(
     def form_valid(self, form):
         """Publish 'pending' content."""
         self.object = form.save(commit=False)
-        self.object.content.set_publish(self.request.user)
+        self.object.content.set_published(self.request.user)
         self.object.content.save()
         messages.info(
             self.request,
@@ -88,6 +96,12 @@ class ContentPublishView(
             )
         )
         return super(ContentPublishView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'project.page.design',
+            kwargs=dict(page=self.object.content.container.section.page.slug)
+        )
 
 
 class ContentRemoveView(
@@ -105,6 +119,12 @@ class ContentRemoveView(
             )
         )
         return super(ContentRemoveView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'project.page.design',
+            kwargs=dict(page=self.object.content.container.section.page.slug)
+        )
 
 
 class ContentUpdateView(
@@ -128,3 +148,9 @@ class ContentUpdateView(
         #self.object.content.save()
         #self.object.content = temp
         return super(ContentUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'project.page.design',
+            kwargs=dict(page=self.object.content.container.section.page.slug)
+        )
