@@ -237,6 +237,8 @@ class GenericContentManager(models.Manager):
 
 class GenericContentModel(TimeStampedModel):
 
+    content = models.OneToOneField(Content)
+
     objects = GenericContentManager()
 
     class Meta:
