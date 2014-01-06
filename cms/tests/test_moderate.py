@@ -5,14 +5,16 @@ from django.test import TestCase
 from base.tests.model_maker import clean_and_save
 from cms.models import (
     Content,
+    SimpleContent,
 )
 from cms.tests.scenario import (
     default_scenario_cms,
     get_container_hatherleigh_two,
-    get_content_hatherleigh_old,
-    get_content_hatherleigh_three,
-    get_content_hatherleigh_two,
-    get_content_jacobstowe_one,
+    get_hatherleigh_old,
+    get_hatherleigh_three,
+    get_hatherleigh_two,
+    get_jacobstowe_one,
+    get_monkokehampton,
     get_layout_body,
     get_page_home,
 )
@@ -35,13 +37,13 @@ class TestModerate(TestCase):
         default_scenario_cms()
 
     def test_is_pending(self):
-        self.assertTrue(get_content_hatherleigh_three().is_pending)
+        self.assertTrue(get_hatherleigh_three().content.is_pending)
 
     def test_is_published(self):
-        self.assertTrue(get_content_hatherleigh_two().is_published)
+        self.assertTrue(get_hatherleigh_two().content.is_published)
 
     def test_is_removed(self):
-        self.assertTrue(get_content_hatherleigh_old().is_removed)
+        self.assertTrue(get_hatherleigh_old().content.is_removed)
 
     def test_two_pending_error(self):
         container = get_container_hatherleigh_two()
@@ -51,14 +53,15 @@ class TestModerate(TestCase):
             Content(
                 container=container,
                 moderate_state=ModerateState.pending(),
-                title='Hatherleigh 2',
             )
         )
 
     def test_published(self):
         page = get_page_home()
         layout = get_layout_body()
-        result = [c.title for c in Content.objects.published(page, layout)]
+        result = [
+            c.title for c in SimpleContent.objects.published(page, layout)
+        ]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
@@ -67,7 +70,7 @@ class TestModerate(TestCase):
     def test_pending(self):
         page = get_page_home()
         layout = get_layout_body()
-        result = [c.title for c in Content.objects.pending(page, layout)]
+        result = [c.title for c in SimpleContent.objects.pending(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Three', 'Jacobstowe One'],
             result
@@ -75,21 +78,21 @@ class TestModerate(TestCase):
 
     def test_publish_not_pending(self):
         """This content is not 'pending' so cannot be published."""
-        content = get_content_hatherleigh_two()
+        c = get_hatherleigh_two()
         self.assertRaises(
             ModerateError,
-            content.publish,
+            c.content.set_published,
             get_user_staff(),
         )
 
     def test_publish(self):
-        content = get_content_hatherleigh_three()
-        content.publish(get_user_staff())
-        content.save()
+        c = get_hatherleigh_three()
+        c.content.set_published(get_user_staff())
+        c.content.save()
         page = get_page_home()
         layout = get_layout_body()
         result = list(
-            Content.objects.published(
+            SimpleContent.objects.published(
                 page, layout
             ).values_list(
                 'title', flat=True
@@ -102,10 +105,10 @@ class TestModerate(TestCase):
 
     def test_remove_already(self):
         """content has already been removed and cannot be removed again."""
-        content = get_content_hatherleigh_old()
+        c = get_hatherleigh_old()
         self.assertRaises(
             ModerateError,
-            content.remove,
+            c.content.set_removed,
             get_user_staff(),
         )
 
@@ -113,10 +116,12 @@ class TestModerate(TestCase):
         """remove pending content."""
         page = get_page_home()
         layout = get_layout_body()
-        content = get_content_hatherleigh_three()
-        content.remove(get_user_staff())
-        content.save()
-        result = [c.title for c in Content.objects.pending(page, layout)]
+        c = get_hatherleigh_three()
+        c.content.set_removed(get_user_staff())
+        c.content.save()
+        result = [
+            c.title for c in SimpleContent.objects.pending(page, layout)
+        ]
         self.assertListEqual(
             ['Hatherleigh Two', 'Jacobstowe One'],
             result
@@ -126,10 +131,12 @@ class TestModerate(TestCase):
         """remove pending content."""
         page = get_page_home()
         layout = get_layout_body()
-        content = get_content_hatherleigh_two()
-        content.remove(get_user_staff())
-        content.save()
-        result = [c.title for c in Content.objects.published(page, layout)]
+        c = get_hatherleigh_two()
+        c.content.set_removed(get_user_staff())
+        c.content.save()
+        result = [
+            c.title for c in SimpleContent.objects.published(page, layout)
+        ]
         self.assertListEqual(
             ['Jacobstowe One',],
             result
@@ -137,13 +144,13 @@ class TestModerate(TestCase):
 
     def test_pending_set(self):
         """edit published content."""
-        content = get_content_jacobstowe_one()
-        content.title = 'Jacobstowe Edit'
-        content.pending(get_user_staff())
-        content.save()
+        c = get_jacobstowe_one()
+        c.title = 'Jacobstowe Edit'
+        c.content.set_pending(get_user_staff())
+        c.save()
         page = get_page_home()
         layout = get_layout_body()
-        result = [c.title for c in Content.objects.pending(page, layout)]
+        result = [c.title for c in SimpleContent.objects.pending(page, layout)]
         self.assertListEqual(
             ['Hatherleigh Three', 'Jacobstowe Edit'],
             result
@@ -156,18 +163,18 @@ class TestModerate(TestCase):
         content already exists in the section.
 
         """
-        content = get_content_hatherleigh_two()
+        c = get_hatherleigh_two()
         self.assertRaises(
             ModerateError,
-            content.pending,
+            c.content.set_pending,
             get_user_staff()
         )
 
     def test_pending_when_removed(self):
         """content has been removed, so cannot set to pending."""
-        content = get_content_hatherleigh_old()
+        c = get_hatherleigh_old()
         self.assertRaises(
             ModerateError,
-            content.pending,
+            c.content.set_pending,
             get_user_staff()
         )

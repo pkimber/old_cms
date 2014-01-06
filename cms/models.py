@@ -109,60 +109,20 @@ reversion.register(Container)
 class ContentManager(models.Manager):
 
     def next_order(self, section):
-        content = self.model.objects.filter(
+        qs = self.model.objects.filter(
             container__section=section,
         ).order_by(
             '-order'
         )[:1]
-        if content:
-            return content[0].order + 1
+        if qs:
+            return qs[0].order + 1
         else:
             return 1
 
-    def pending(self, page, layout):
-        """Return a list of pending content for a page.
-
-        Note: we return a list of content not a queryset.
-
-        """
-        pending = ModerateState.pending()
-        published = ModerateState.published()
-        qs = self.model.objects.filter(
-            container__section__page=page,
-            container__section__layout=layout,
-            moderate_state__in=[published, pending],
-        ).order_by(
-            'order',
-        )
-        result = {}
-        for content in qs:
-            if content.container.pk in result:
-                if content.moderate_state == pending:
-                    result[content.container.pk] = content
-            else:
-                result[content.container.pk] = content
-        return result.values()
-
-    def published(self, page, layout):
-        """Return a published content for a page."""
-        published = ModerateState.published()
-        return self.model.objects.filter(
-            container__section__page=page,
-            container__section__layout=layout,
-            moderate_state=published,
-        ).order_by(
-            'order',
-        )
-
 
 class Content(ModerateModel, TimeStampedModel):
-    """Simple section on a web page."""
     container = models.ForeignKey(Container)
     order = models.IntegerField()
-    title = models.TextField()
-    description = models.TextField(blank=True, null=True)
-    picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
-    url = models.URLField(blank=True, null=True)
     objects = ContentManager()
 
     class Meta:
@@ -172,30 +132,30 @@ class Content(ModerateModel, TimeStampedModel):
         verbose_name_plural = 'Content'
 
     def __unicode__(self):
-        return unicode('{} {}'.format(self.title, self.moderate_state))
+        return unicode('{}: {}, order {}'.format(self.pk, self.moderate_state, self.order))
 
     def _delete_removed_content(self):
         """delete content which was previously removed."""
         try:
-            content = self.container.content_set.get(
+            c = self.container.content_set.get(
                 moderate_state=ModerateState.removed()
             )
-            content.delete()
+            c.delete()
         except Content.DoesNotExist:
             pass
 
     def _set_published_to_remove(self, user):
         """publishing new content, so remove currently published content."""
         try:
-            content = self.container.content_set.get(
+            c = self.container.content_set.get(
                 moderate_state=ModerateState.published()
             )
-            content.set_removed(user)
-            content.save()
+            c.set_removed(user)
+            c.save()
         except Content.DoesNotExist:
             pass
 
-    def pending(self, user):
+    def set_pending(self, user):
         if self.moderate_state == ModerateState.published():
             try:
                 self.container.content_set.get(
@@ -206,7 +166,7 @@ class Content(ModerateModel, TimeStampedModel):
                     "published content should not be edited."
                 )
             except Content.DoesNotExist:
-                self.set_pending(user)
+                self._set_pending(user)
                 self.pk = None
         elif self.moderate_state == ModerateState.pending():
             return
@@ -215,7 +175,7 @@ class Content(ModerateModel, TimeStampedModel):
                 "Cannot edit content which has been removed"
             )
 
-    def publish(self, user):
+    def set_published(self, user):
         """Publish content."""
         if not self.moderate_state == ModerateState.pending():
             raise ModerateError(
@@ -223,15 +183,83 @@ class Content(ModerateModel, TimeStampedModel):
             )
         self._delete_removed_content()
         self._set_published_to_remove(user)
-        self.set_published(user)
+        self._set_published(user)
 
-    def remove(self, user):
+    def set_removed(self, user):
         """Remove content."""
         if self.moderate_state == ModerateState.removed():
             raise ModerateError(
                 "Cannot remove content which has already been removed"
             )
         self._delete_removed_content()
-        self.set_removed(user)
+        self._set_removed(user)
 
 reversion.register(Content)
+
+
+class GenericContentManager(models.Manager):
+
+    def pending(self, page, layout):
+        """Return a list of pending content for a page.
+
+        Note: we return a list of content not a queryset.
+
+        """
+        pending = ModerateState.pending()
+        published = ModerateState.published()
+        qs = self.model.objects.filter(
+            content__container__section__page=page,
+            content__container__section__layout=layout,
+            content__moderate_state__in=[published, pending],
+        ).order_by(
+            'content__order',
+        )
+        result = {}
+        for c in qs:
+            if c.content.container.pk in result:
+                if c.content.moderate_state == pending:
+                    result[c.content.container.pk] = content
+            else:
+                result[c.content.container.pk] = c
+        return result.values()
+
+    def published(self, page, layout):
+        """Return a published content for a page."""
+        published = ModerateState.published()
+        return self.model.objects.filter(
+            content__container__section__page=page,
+            content__container__section__layout=layout,
+            content__moderate_state=published,
+        ).order_by(
+            'content__order',
+        )
+
+
+
+class SimpleContent(TimeStampedModel):
+    content = models.OneToOneField(Content)
+    title = models.TextField()
+    description = models.TextField(blank=True, null=True)
+    picture = models.ImageField(upload_to='cms/simple/%Y/%m/%d', blank=True)
+    url = models.URLField(blank=True, null=True)
+    objects = GenericContentManager()
+
+    class Meta:
+        verbose_name = 'Simple content'
+        verbose_name_plural = 'Simple content'
+
+    def __unicode__(self):
+        return unicode('{} {}'.format(self.title, self.content.moderate_state))
+
+
+class TextContent(TimeStampedModel):
+    content = models.OneToOneField(Content)
+    title = models.TextField()
+    objects = GenericContentManager()
+
+    class Meta:
+        verbose_name = 'Text content'
+        verbose_name_plural = 'Text content'
+
+    def __unicode__(self):
+        return unicode('{} {}'.format(self.title, self.content.moderate_state))

@@ -13,5 +13,5 @@ def cms_add(page_slug, layout_slug):
 
 
 @register.inclusion_tag('cms/_moderate.html')
-def cms_moderate(content):
-    return dict(content=content)
+def cms_moderate(generic_content):
+    return dict(generic_content=generic_content)

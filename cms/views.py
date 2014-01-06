@@ -57,29 +57,29 @@ class ContentCreateView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         ContentPageMixin, BaseMixin, CreateView):
 
-    model = Content
-
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        # create a new container for this content
+        # create a new container for the content
         section = self.get_section()
         container = Container(section=section)
         container.save()
-        # init our new content object
-        self.object.container = container
-        self.object.order = Content.objects.next_order(container.section)
+        # create a new content object for the ...
+        content = Content(container=container)
+        content.order = Content.objects.next_order(section)
+        content.save()
+        # init our object (one to one relation to content)
+        self.object.content = content
         return super(ContentCreateView, self).form_valid(form)
 
 
 class ContentPublishView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
 
-    model = Content
-
     def form_valid(self, form):
         """Publish 'pending' content."""
         self.object = form.save(commit=False)
-        self.object.publish(self.request.user)
+        self.object.content.set_publish(self.request.user)
+        self.object.content.save()
         messages.info(
             self.request,
             "Published content {}, {}".format(
@@ -93,11 +93,10 @@ class ContentPublishView(
 class ContentRemoveView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
 
-    model = Content
-
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.object.remove(self.request.user)
+        self.object.content.set_removed(self.request.user)
+        self.object.content.save()
         messages.info(
             self.request,
             "Removed content {}, {}".format(
@@ -111,9 +110,21 @@ class ContentRemoveView(
 class ContentUpdateView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
 
-    model = Content
-
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.object.pending(self.request.user)
+        content = self.object.content
+        content.set_pending(self.request.user)
+        is_new_content = not content.pk
+        if is_new_content:
+            self.object.pk = None
+        content.save()
+        if is_new_content:
+            self.object.content = content
+        #import ipdb
+        #ipdb.set_trace()
+        #self.object.content.set_pending(self.request.user)
+        #if not self.object.content.pk:
+        #    self.object.pk = None
+        #self.object.content.save()
+        #self.object.content = temp
         return super(ContentUpdateView, self).form_valid(form)

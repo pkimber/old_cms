@@ -8,6 +8,8 @@ from cms.models import (
     Layout,
     Page,
     Section,
+    SimpleContent,
+    TextContent,
 )
 
 
@@ -20,12 +22,11 @@ def make_container(section, **kwargs):
     return clean_and_save(Container(**defaults))
 
 
-def make_content(container, order, moderate_state, title, **kwargs):
+def make_content(container, order, moderate_state, **kwargs):
     defaults = dict(
         container=container,
         order=order,
         moderate_state=moderate_state,
-        title=title,
     )
     defaults.update(kwargs)
     return clean_and_save(Content(**defaults))
@@ -58,3 +59,21 @@ def make_section(page, layout, **kwargs):
     )
     defaults.update(kwargs)
     return clean_and_save(Section(**defaults))
+
+
+def make_simple_content(content, title, **kwargs):
+    defaults = dict(
+        content=content,
+        title=title,
+    )
+    defaults.update(kwargs)
+    return clean_and_save(SimpleContent(**defaults))
+
+
+def make_text_content(content, title, **kwargs):
+    defaults = dict(
+        content=content,
+        title=title,
+    )
+    defaults.update(kwargs)
+    return clean_and_save(TextContent(**defaults))

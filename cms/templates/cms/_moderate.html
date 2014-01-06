@@ -1,15 +1,15 @@
 <!-- <strong>[{{ content.moderate_state }}]</strong> -->
-{% if content.is_pending %}
-  <a class="pure-button pure-button-xsmall" href="{% url 'project.content.publish' content.pk %}">
+{% if generic_content.content.is_pending %}
+  <a class="pure-button pure-button-xsmall" href="{% url 'project.content.publish' generic_content.pk %}">
     <i class="fa fa-check"></i>
     publish
   </a>
 {% endif %}
-<a class="pure-button pure-button-xsmall" href="{% url 'project.content.update' content.pk %}">
+<a class="pure-button pure-button-xsmall" href="{% url 'project.content.update' generic_content.pk %}">
   <i class="fa fa-edit"></i>
   edit
 </a>
-<a class="pure-button pure-button-xsmall" href="{% url 'project.content.remove' content.pk %}">
+<a class="pure-button pure-button-xsmall" href="{% url 'project.content.remove' generic_content.pk %}">
   <i class="fa fa-times"></i>
   remove
 </a>
