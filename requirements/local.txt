@@ -4,6 +4,7 @@ fabric
 gitpython==0.3.1-beta2
 ipdb
 hgapi
+IPy==0.81
 psycopg2
 pytest-django
 pyyaml
