@@ -1,13 +1,11 @@
 from base.tests.model_maker import clean_and_save
 from cms.models import (
-    Content,
     Layout,
     Page,
     Section,
 )
 from cms.tests.model_maker import (
     make_container,
-    make_content,
     make_page,
     make_layout,
     make_section,

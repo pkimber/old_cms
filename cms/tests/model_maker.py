@@ -4,30 +4,30 @@ from base.tests.model_maker import clean_and_save
 
 from cms.models import (
     Container,
-    Content,
     Layout,
     Page,
     Section,
 )
 
 
-def make_container(section, **kwargs):
+def make_container(section, order, **kwargs):
     defaults = dict(
         section=section,
+        order=order,
         **kwargs
     )
     defaults.update(kwargs)
     return clean_and_save(Container(**defaults))
 
 
-def make_content(container, order, moderate_state, **kwargs):
-    defaults = dict(
-        container=container,
-        order=order,
-        moderate_state=moderate_state,
-    )
-    defaults.update(kwargs)
-    return clean_and_save(Content(**defaults))
+#def make_content(container, order, moderate_state, **kwargs):
+#    defaults = dict(
+#        container=container,
+#        order=order,
+#        moderate_state=moderate_state,
+#    )
+#    defaults.update(kwargs)
+#    return clean_and_save(Content(**defaults))
 
 
 def make_layout(name, **kwargs):

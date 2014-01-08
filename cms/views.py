@@ -16,7 +16,6 @@ from base.view_utils import BaseMixin
 from cms.models import (
     CmsError,
     Container,
-    Content,
     Layout,
     Page,
     Section,
@@ -61,15 +60,20 @@ class ContentCreateView(
     def form_valid(self, form):
         self.object = form.save(commit=False)
         # create a new container for the content
+        import ipdb
+        ipdb.set_trace()
         section = self.get_section()
-        container = Container(section=section)
+        container = Container(section=section, order=section.next_order())
         container.save()
         # create a new content object for the ...
-        content = Content(container=container)
-        content.order = Content.objects.next_order(section)
-        content.save()
+        #content = Content(container=container)
+        self.object.container = container
+        #self.object.order = self.objects.next_order(section)
+        #self.object._get_content_set().all()
+        #self.object.order = section.next_order()
+        #content.save()
         # init our object (one to one relation to content)
-        self.object.content = content
+        #self.object.content = content
         return super(ContentCreateView, self).form_valid(form)
 
     def get_success_url(self):
@@ -86,8 +90,8 @@ class ContentPublishView(
     def form_valid(self, form):
         """Publish 'pending' content."""
         self.object = form.save(commit=False)
-        self.object.content.set_published(self.request.user)
-        self.object.content.save()
+        self.object.set_published(self.request.user)
+        #self.object.content.save()
         messages.info(
             self.request,
             "Published content {}, {}".format(
@@ -100,7 +104,7 @@ class ContentPublishView(
     def get_success_url(self):
         return reverse(
             'project.page.design',
-            kwargs=dict(page=self.object.content.container.section.page.slug)
+            kwargs=dict(page=self.object.container.section.page.slug)
         )
 
 
@@ -123,7 +127,7 @@ class ContentRemoveView(
     def get_success_url(self):
         return reverse(
             'project.page.design',
-            kwargs=dict(page=self.object.content.container.section.page.slug)
+            kwargs=dict(page=self.object.container.section.page.slug)
         )
 
 
@@ -132,18 +136,17 @@ class ContentUpdateView(
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        content = self.object.content
-        content.set_pending(self.request.user)
-        is_new_content = not content.pk
-        if is_new_content:
-            self.object.pk = None
-        content.save()
-        if is_new_content:
-            self.object.content = content
+        self.object.set_pending(self.request.user)
+        #is_new_content = not content.pk
+        #if is_new_content:
+        #    self.object.pk = None
+        #content.save()
+        #if is_new_content:
+        #    self.object.content = content
         return super(ContentUpdateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse(
             'project.page.design',
-            kwargs=dict(page=self.object.content.container.section.page.slug)
+            kwargs=dict(page=self.object.container.section.page.slug)
         )
