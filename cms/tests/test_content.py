@@ -2,21 +2,17 @@ from django.test import TestCase
 
 from base.tests.model_maker import clean_and_save
 from cms.models import (
-    #Content,
+    ModerateState,
     Page,
     Section,
 )
 from cms.tests.model_maker import (
     make_container,
-    #make_content,
     make_layout,
     make_page,
     make_section,
 )
-from moderate.models import (
-    ModerateState,
-)
-from moderate.tests.scenario import default_moderate_state
+from cms.tests.scenario import default_moderate_state
 
 
 class TestContent(TestCase):

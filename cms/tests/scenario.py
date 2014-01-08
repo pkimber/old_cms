@@ -6,15 +6,12 @@ from cms.models import (
 )
 from cms.tests.model_maker import (
     make_container,
-    make_page,
     make_layout,
+    make_page,
+    make_moderate_state,
     make_section,
 )
-from moderate.models import (
-    ModerateError,
-    ModerateState,
-)
-from moderate.tests.scenario import default_moderate_state
+from cms.models import ModerateState
 
 
 def get_layout_body():
@@ -52,6 +49,21 @@ def get_section_information_body():
         page=get_page_information(),
         layout=get_layout_body(),
     )
+
+
+def default_moderate_state():
+    try:
+        ModerateState.pending()
+    except ModerateState.DoesNotExist:
+        make_moderate_state('pending')
+    try:
+        ModerateState.published()
+    except ModerateState.DoesNotExist:
+        make_moderate_state('published')
+    try:
+        ModerateState.removed()
+    except ModerateState.DoesNotExist:
+        make_moderate_state('removed')
 
 
 def default_scenario_cms():

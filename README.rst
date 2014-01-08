@@ -18,7 +18,6 @@ to make sure a file has been created for you)::
   echo "export DJANGO_SETTINGS_MODULE=example.dev_patrick" >> $VIRTUAL_ENV/bin/postactivate
   echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
 
-  add2virtualenv ../moderate
   add2virtualenv ../base
   add2virtualenv ../login
   add2virtualenv .
@@ -35,7 +34,6 @@ Check the imports are in the correct order e.g::
   /home/patrick/repo/dev/app/cms
   /home/patrick/repo/dev/app/login
   /home/patrick/repo/dev/app/base
-  /home/patrick/repo/dev/app/moderate
 
 Testing
 =======
@@ -62,7 +60,7 @@ Usage
       django-admin.py syncdb --noinput && \
       django-admin.py migrate --all --noinput && \
       django-admin.py demo_data_login && \
-      django-admin.py init_app_moderate && \
+      django-admin.py init_app_cms && \
       django-admin.py demo_data_cms && \
       django-admin.py runserver
 

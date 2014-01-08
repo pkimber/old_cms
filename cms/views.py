@@ -60,8 +60,6 @@ class ContentCreateView(
     def form_valid(self, form):
         self.object = form.save(commit=False)
         # create a new container for the content
-        import ipdb
-        ipdb.set_trace()
         section = self.get_section()
         container = Container(section=section, order=section.next_order())
         container.save()
