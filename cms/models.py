@@ -178,6 +178,9 @@ class Container(TimeStampedModel):
 
     """
     section = models.ForeignKey(Section)
+    # TODO I am not sure we need 'order' on this model at all.  The 'order' of
+    # an object should probably be the responsibility of the content object.
+    # In fact, in some cases the ordering might be by something else e.g. date.
     order = models.IntegerField()
 
     class Meta:
@@ -204,13 +207,13 @@ class ContentManager(models.Manager):
             container__section=section,
             moderate_state__in=[published, pending],
         ).order_by(
-            'container__order',
+            'pk',
         )
         result = {}
         for c in qs:
             if c.container.pk in result:
                 if c.moderate_state == pending:
-                    result[c.container.pk] = container
+                    result[c.container.pk] = c
             else:
                 result[c.container.pk] = c
         return result.values()
