@@ -1,9 +1,16 @@
 from django.contrib import admin
 
 from .models import (
+    Layout,
     Page,
     Section,
 )
+
+
+class LayoutAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Layout, LayoutAdmin)
 
 
 class PageAdmin(admin.ModelAdmin):
