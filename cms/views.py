@@ -102,8 +102,7 @@ class ContentRemoveView(
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.object.content.set_removed(self.request.user)
-        self.object.content.save()
+        self.object.set_removed(self.request.user)
         messages.info(
             self.request,
             "Removed content {}, {}".format(
