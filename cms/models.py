@@ -1,3 +1,5 @@
+import collections
+
 from datetime import datetime
 
 from django.conf import settings
@@ -207,9 +209,9 @@ class ContentManager(models.Manager):
             container__section=section,
             moderate_state__in=[published, pending],
         ).order_by(
-            'pk',
+            'container__order',
         )
-        result = {}
+        result = collections.OrderedDict()
         for c in qs:
             if c.container.pk in result:
                 if c.moderate_state == pending:
