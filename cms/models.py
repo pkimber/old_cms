@@ -102,11 +102,7 @@ class PageManager(models.Manager):
 
     def menu(self):
         """Return page objects for a menu."""
-        return self.model.objects.filter(
-            order__gt=0
-        ).order_by(
-            'order'
-        )
+        return self.model.objects.all().order_by('order')
 
 
 class Page(TimeStampedModel):
@@ -118,6 +114,7 @@ class Page(TimeStampedModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     order = models.IntegerField(default=0)
+    is_home = models.BooleanField(default=False)
     objects = PageManager()
 
     class Meta:

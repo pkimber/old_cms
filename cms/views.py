@@ -22,7 +22,7 @@ from cms.models import (
 )
 
 
-class ContentPageMixin(object):
+class ContentPageMixin(BaseMixin):
     """Page information."""
 
     def get_context_data(self, **kwargs):
