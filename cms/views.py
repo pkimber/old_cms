@@ -83,9 +83,8 @@ class ContentPublishView(
         self.object.set_published(self.request.user)
         messages.info(
             self.request,
-            "Published content {}, {}".format(
+            "Published content, id {}".format(
                 self.object.pk,
-                self.object.title,
             )
         )
         return super(ContentPublishView, self).form_valid(form)
