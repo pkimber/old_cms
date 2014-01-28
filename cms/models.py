@@ -237,12 +237,6 @@ class ContentModel(TimeStampedModel):
         self.user_moderated = user
         self.moderate_state = moderate_state
 
-    def _set_pending(self, user):
-        self._set_moderated(user, ModerateState.pending())
-
-    def _set_published(self, user):
-        self._set_moderated(user, ModerateState.published())
-
     def _set_published_to_remove(self, user):
         """publishing new content, so remove currently published content."""
         try:
@@ -253,9 +247,6 @@ class ContentModel(TimeStampedModel):
             c.save()
         except self.DoesNotExist:
             pass
-
-    def _set_removed(self, user):
-        self._set_moderated(user, ModerateState.removed())
 
     def set_pending(self, user):
         if self.moderate_state == ModerateState.published():
@@ -268,7 +259,7 @@ class ContentModel(TimeStampedModel):
                     "published content should not be edited."
                 )
             except self.DoesNotExist:
-                self._set_pending(user)
+                self._set_moderated(user, ModerateState.pending())
                 self.pk = None
         elif self.moderate_state == ModerateState.pending():
             return
@@ -285,7 +276,7 @@ class ContentModel(TimeStampedModel):
             )
         self._delete_removed_content()
         self._set_published_to_remove(user)
-        self._set_published(user)
+        self._set_moderated(user, ModerateState.published())
 
     def set_removed(self, user):
         """Remove content."""
@@ -294,7 +285,7 @@ class ContentModel(TimeStampedModel):
                 "Cannot remove content which has already been removed"
             )
         self._delete_removed_content()
-        self._set_removed(user)
+        self._set_moderated(user, ModerateState.removed())
 
     def url_publish(self):
         raise CmsError("class must implement 'url_publish' method")
