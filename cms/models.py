@@ -150,7 +150,7 @@ reversion.register(Container)
 
 class ContentManager(models.Manager):
 
-    def pending(self, section):
+    def pending(self, section, kwargs=None):
         """Return a list of pending content for a section.
 
         Note: we return a list of content instances not a queryset.
@@ -161,9 +161,10 @@ class ContentManager(models.Manager):
         qs = self.model.objects.filter(
             container__section=section,
             moderate_state__in=[published, pending],
-        ).order_by(
-            'container__order',
         )
+        if kwargs:
+            qs = qs.filter(**kwargs)
+        qs = qs.order_by('-container__order')
         result = collections.OrderedDict()
         for c in qs:
             if c.container.pk in result:
@@ -180,7 +181,7 @@ class ContentManager(models.Manager):
             container__section=section,
             moderate_state=published,
         ).order_by(
-            'container__order',
+            '-container__order',
         )
 
 
