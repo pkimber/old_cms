@@ -5,7 +5,6 @@ from cms.models import (
     Section,
 )
 from cms.tests.model_maker import (
-    make_container,
     make_layout,
     make_page,
     make_moderate_state,
