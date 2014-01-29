@@ -1,10 +1,13 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+import reversion
+
 from cms.models import ContentModel
 
 
 class TestContent(ContentModel):
+
     title = models.TextField()
 
     class Meta:
@@ -15,7 +18,7 @@ class TestContent(ContentModel):
         verbose_name_plural = 'Titles'
 
     def _get_content_set(self):
-        return self.container.titlecontent_set
+        return self.container.testcontent_set
 
     def __unicode__(self):
         return unicode('{} {}'.format(self.title, self.moderate_state))
@@ -28,3 +31,5 @@ class TestContent(ContentModel):
 
     def url_update(self):
         return reverse('example.test.update', kwargs={'pk': self.pk})
+
+reversion.register(TestContent)

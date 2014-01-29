@@ -53,9 +53,7 @@ class ContentPageMixin(BaseMixin):
         )
 
 
-class ContentCreateView(
-        LoginRequiredMixin, StaffuserRequiredMixin,
-        ContentPageMixin, BaseMixin, CreateView):
+class ContentCreateView(ContentPageMixin, BaseMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -74,8 +72,7 @@ class ContentCreateView(
         )
 
 
-class ContentPublishView(
-        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+class ContentPublishView(BaseMixin, UpdateView):
 
     def form_valid(self, form):
         """Publish 'pending' content."""
@@ -96,8 +93,7 @@ class ContentPublishView(
         )
 
 
-class ContentRemoveView(
-        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+class ContentRemoveView(BaseMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -118,8 +114,7 @@ class ContentRemoveView(
         )
 
 
-class ContentUpdateView(
-        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+class ContentUpdateView(BaseMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
