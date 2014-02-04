@@ -15,7 +15,6 @@ def make_container(section, order, **kwargs):
     defaults = dict(
         section=section,
         order=order,
-        **kwargs
     )
     defaults.update(kwargs)
     return clean_and_save(Container(**defaults))
@@ -44,7 +43,6 @@ def make_section(page, layout, **kwargs):
     defaults = dict(
         page=page,
         layout=layout,
-        **kwargs
     )
     defaults.update(kwargs)
     return clean_and_save(Section(**defaults))

@@ -48,7 +48,7 @@ class TestTestContent(TestCase):
         )
         pending = TestContent.objects.pending(self.section)
         self.assertListEqual(
-            ['ABC', 'LMN', 'XYZ'],
+            ['XYZ', 'LMN', 'ABC'],
             [t.title for t in pending]
         )
 
@@ -66,6 +66,6 @@ class TestTestContent(TestCase):
         )
         published = TestContent.objects.published(self.section)
         self.assertListEqual(
-            ['ABC', 'XYZ'],
+            ['XYZ', 'ABC'],
             [t.title for t in published]
         )

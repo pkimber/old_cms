@@ -4,7 +4,7 @@ from cms.models import Page
 from cms.service import init_page
 
 
-class TestContent(TestCase):
+class TestService(TestCase):
 
     def setUp(self):
         self.SLUG = 'home'
