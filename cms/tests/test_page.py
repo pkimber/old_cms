@@ -4,7 +4,7 @@ from cms.models import Page
 from cms.tests.model_maker import make_page
 
 
-class TestContent(TestCase):
+class TestPage(TestCase):
 
     def setUp(self):
         self.page = make_page('Home', 0)
