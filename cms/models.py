@@ -162,9 +162,14 @@ class ContentManager(models.Manager):
             container__section=section,
             moderate_state__in=[published, pending],
         )
+        order_by = None
         if kwargs:
+            order_by = kwargs.pop('order_by', None)
             qs = qs.filter(**kwargs)
-        qs = qs.order_by('container__order')
+        if order_by:
+            qs = qs.order_by(order_by)
+        else:
+            qs = qs.order_by('container__order')
         result = collections.OrderedDict()
         for c in qs:
             if c.container.pk in result:
