@@ -30,11 +30,11 @@ class TestTestContent(TestCase):
         pass
 
     def test_pending_order(self):
-        """Pending items should by in 'order' order."""
+        """Pending items should be in 'order' order."""
         make_test_content(
             make_container(self.section, 5),
             ModerateState.pending(),
-            'XYZ'
+            'ABC'
         )
         make_test_content(
             make_container(self.section, 3),
@@ -44,11 +44,15 @@ class TestTestContent(TestCase):
         make_test_content(
             make_container(self.section, 1),
             ModerateState.pending(),
-            'ABC'
+            'XYZ'
         )
         pending = TestContent.objects.pending(self.section)
         self.assertListEqual(
-            ['XYZ', 'LMN', 'ABC'],
+            [
+                'XYZ',
+                'LMN',
+                'ABC',
+            ],
             [t.title for t in pending]
         )
 
@@ -57,12 +61,12 @@ class TestTestContent(TestCase):
         make_test_content(
             make_container(self.section, 9),
             ModerateState.published(),
-            'XYZ'
+            'ABC'
         )
         make_test_content(
             make_container(self.section, 8),
             ModerateState.published(),
-            'ABC'
+            'XYZ'
         )
         published = TestContent.objects.published(self.section)
         self.assertListEqual(

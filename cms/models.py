@@ -164,7 +164,7 @@ class ContentManager(models.Manager):
         )
         if kwargs:
             qs = qs.filter(**kwargs)
-        qs = qs.order_by('-container__order')
+        qs = qs.order_by('container__order')
         result = collections.OrderedDict()
         for c in qs:
             if c.container.pk in result:
@@ -181,7 +181,7 @@ class ContentManager(models.Manager):
             container__section=section,
             moderate_state=published,
         ).order_by(
-            '-container__order',
+            'container__order',
         )
 
 
