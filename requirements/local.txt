@@ -1,10 +1,10 @@
 -r base.txt
 beautifulsoup4
 fabric
-gitpython==0.3.1-beta2
+gitpython
 ipdb
 hgapi
-IPy==0.81
+IPy
 psycopg2
 pytest-django
 pyyaml

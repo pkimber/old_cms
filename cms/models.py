@@ -1,3 +1,6 @@
+# -*- encoding: utf-8 -*-
+
+from __future__ import unicode_literals
 import collections
 
 from datetime import datetime
@@ -36,8 +39,8 @@ class ModerateState(models.Model):
         verbose_name = 'Moderate'
         verbose_name_plural = 'Moderated'
 
-    def __unicode__(self):
-        return unicode('{}'.format(self.name))
+    def __str__(self):
+        return '{}'.format(self.name)
 
     @staticmethod
     def pending():
@@ -78,8 +81,8 @@ class Page(TimeStampedModel):
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
 
-    def __unicode__(self):
-        return unicode('{}'.format(self.name))
+    def __str__(self):
+        return '{}'.format(self.name)
 
 reversion.register(Page)
 
@@ -94,8 +97,8 @@ class Layout(TimeStampedModel):
         verbose_name = 'Layout'
         verbose_name_plural = 'Layout'
 
-    def __unicode__(self):
-        return unicode('{}'.format(self.name))
+    def __str__(self):
+        return '{}'.format(self.name)
 
 reversion.register(Layout)
 
@@ -111,8 +114,8 @@ class Section(TimeStampedModel):
         verbose_name = 'Section'
         verbose_name_plural = 'Sections'
 
-    def __unicode__(self):
-        return unicode('{}'.format(self.page.name))
+    def __str__(self):
+        return '{}'.format(self.page.name)
 
     def next_order(self):
         qs = self.container_set.all().order_by(
@@ -142,8 +145,8 @@ class Container(TimeStampedModel):
         verbose_name = 'Container'
         verbose_name_plural = 'Containers'
 
-    def __unicode__(self):
-        return unicode('{}'.format(self.section.page.name))
+    def __str__(self):
+        return '{}'.format(self.section.page.name)
 
 reversion.register(Container)
 
@@ -208,8 +211,10 @@ class ContentModel(TimeStampedModel):
         verbose_name = 'Content'
         verbose_name_plural = 'Content'
 
-    def __unicode__(self):
-        return unicode('{}: {}, order {}'.format(self.pk, self.moderate_state, self.order))
+    def __str__(self):
+        return '{}: {}, order {}'.format(
+            self.pk, self.moderate_state, self.order
+        )
 
     def _delete_removed_content(self):
         """delete content which was previously removed."""

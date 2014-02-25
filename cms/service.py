@@ -1,3 +1,6 @@
+# -*- encoding: utf-8 -*-
+
+from __future__ import unicode_literals
 from django.utils.text import slugify
 
 from cms.models import (
@@ -27,7 +30,7 @@ def init_container(section, order):
 def init_layout(name):
     """Create a layout if it doesn't already exist."""
     try:
-        result = Layout.objects.get(slug=slugify(unicode(name)))
+        result = Layout.objects.get(slug=slugify(name))
     except Layout.DoesNotExist:
         result = make_layout(name)
     return result
@@ -38,7 +41,7 @@ def init_page(name, order, is_home=None):
     if not is_home:
         is_home = False
     try:
-        result = Page.objects.get(slug=slugify(unicode(name)))
+        result = Page.objects.get(slug=slugify(name))
         update = False
         if order != result.order:
             result.order = order
