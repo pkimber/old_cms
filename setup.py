@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-
-from __future__ import unicode_literals
 import os
 from distutils.core import setup
 
@@ -31,7 +28,7 @@ setup(
             'templates/cms/*.*',
         ],
     },
-    version='0.0.21',
+    version='0.0.22',
     description='cms',
     author='Patrick Kimber',
     author_email='code@pkimber.net',
