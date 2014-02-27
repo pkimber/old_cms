@@ -89,7 +89,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'order': ('django.db.models.fields.IntegerField', [], {}),
-            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cms.Section']"})
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Section']"})
         },
         'cms.layout': {
             'Meta': {'ordering': "('name',)", 'object_name': 'Layout'},
@@ -118,9 +118,9 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['page', 'modified']", 'unique_together': "(('page', 'layout'),)", 'object_name': 'Section'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'layout': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cms.Layout']"}),
+            'layout': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Layout']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'page': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['cms.Page']"})
+            'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']"})
         }
     }
 
