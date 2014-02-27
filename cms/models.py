@@ -180,7 +180,7 @@ class ContentManager(models.Manager):
                     result[c.container.pk] = c
             else:
                 result[c.container.pk] = c
-        return result.values()
+        return list(result.values())
 
     def published(self, section):
         """Return a published content for a page."""
