@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 from django.test import TestCase
 
-from cms.management.commands import demo_data_cms
-from cms.management.commands import init_app_cms
-from login.management.commands import demo_data_login
+from cms.management.commands import (
+    demo_data_cms,
+    init_app_cms,
+)
 
 
 class TestCommand(TestCase):

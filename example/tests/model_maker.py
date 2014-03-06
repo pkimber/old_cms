@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
-from django.utils.text import slugify
 
 from base.tests.model_maker import clean_and_save
 

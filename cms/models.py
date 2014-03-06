@@ -1,14 +1,12 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 import collections
 
 from datetime import datetime
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import Q
 
 import reversion
 
@@ -207,7 +205,11 @@ class ContentModel(TimeStampedModel):
 
     class Meta:
         abstract = True
-        ordering = ['container__section__page__name', 'order', 'moderate_state__slug']
+        ordering = [
+            'container__section__page__name',
+            'order',
+            'moderate_state__slug',
+        ]
         verbose_name = 'Content'
         verbose_name_plural = 'Content'
 

@@ -9,5 +9,7 @@ ipdb
 IPy
 psycopg2
 pytest-django
+pytest-flakes
+pytest-pep8
 pyyaml
 walkdir

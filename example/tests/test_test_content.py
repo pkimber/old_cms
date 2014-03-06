@@ -1,14 +1,9 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 from django.test import TestCase
 
-from base.tests.model_maker import clean_and_save
-from cms.models import (
-    ModerateState,
-    Page,
-    Section,
-)
+from cms.models import ModerateState
 from cms.tests.model_maker import (
     make_container,
     make_layout,

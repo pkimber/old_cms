@@ -1,18 +1,12 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.views.generic import (
     CreateView,
     UpdateView,
-)
-
-from braces.views import (
-    LoginRequiredMixin,
-    StaffuserRequiredMixin,
 )
 
 from base.view_utils import BaseMixin
@@ -53,7 +47,6 @@ class ContentPageMixin(BaseMixin):
             return Page.objects.get(slug=page)
         except Page.DoesNotExist:
             raise CmsError("Page '{}' does not exist".format(page))
-
 
     def get_section(self):
         return get_object_or_404(

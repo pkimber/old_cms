@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 from django.test import TestCase
 
 from cms.models import Page
@@ -24,7 +24,7 @@ class TestService(TestCase):
     def test_init(self):
         init_page(self.HOME, 0)
         try:
-            page = Page.objects.get(slug=self.SLUG)
+            Page.objects.get(slug=self.SLUG)
         except Page.DoesNotExist:
             self.fail("'{}' page was not initialised".format(self.SLUG))
 

@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
-
 from __future__ import unicode_literals
-from base.tests.model_maker import clean_and_save
+
 from cms.models import (
     Layout,
+    ModerateState,
     Page,
     Section,
 )
@@ -13,7 +13,6 @@ from cms.tests.model_maker import (
     make_moderate_state,
     make_section,
 )
-from cms.models import ModerateState
 
 
 def get_layout_body():
