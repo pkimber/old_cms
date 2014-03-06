@@ -40,13 +40,20 @@ class ContentPageMixin(BaseMixin):
         layout = self.kwargs.get('layout', None)
         if not layout:
             raise CmsError("no 'layout' parameter in url")
-        return get_object_or_404(Layout, slug=layout)
+        try:
+            return Layout.objects.get(slug=layout)
+        except Layout.DoesNotExist:
+            raise CmsError("Layout '{}' does not exist".format(layout))
 
     def get_page(self):
         page = self.kwargs.get('page', None)
         if not page:
             raise CmsError("no 'page' parameter in url")
-        return get_object_or_404(Page, slug=page)
+        try:
+            return Page.objects.get(slug=page)
+        except Page.DoesNotExist:
+            raise CmsError("Page '{}' does not exist".format(page))
+
 
     def get_section(self):
         return get_object_or_404(
